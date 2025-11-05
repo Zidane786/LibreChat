@@ -108,10 +108,15 @@ async def root():
 
 
 # Import and include routers
-# TODO: Import route modules as they are created
-# from app.routes import auth, user, messages, conversations, etc.
-# app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-# app.include_router(user.router, prefix="/api/user", tags=["user"])
+from app.routes import auth, user
+
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(user.router, prefix="/api/user", tags=["user"])
+
+# TODO: Add remaining route modules as they are created
+# from app.routes import messages, conversations, prompts, agents, etc.
+# app.include_router(messages.router, prefix="/api/messages", tags=["messages"])
+# app.include_router(conversations.router, prefix="/api/convos", tags=["conversations"])
 # etc.
 
 
