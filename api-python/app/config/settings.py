@@ -106,7 +106,11 @@ class Settings(BaseSettings):
 
     # File Storage Configuration
     file_storage_type: str = Field(default="local", description="File storage type (local, s3, azure)")
+    file_strategy: str = Field(default="local", description="File strategy (local, s3, azure_blob)")
+    file_upload_path: str = Field(default="/app/uploads", description="File upload path")
     file_upload_max_size: int = Field(default=20971520, description="Max file upload size (20MB)")
+    file_size_limit: int = Field(default=20971520, description="File size limit (20MB)")
+    avatar_size_limit: int = Field(default=2097152, description="Avatar size limit (2MB)")
 
     # S3 Configuration
     aws_access_key_id: Optional[str] = Field(default=None, description="AWS access key ID")

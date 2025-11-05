@@ -23,10 +23,22 @@ async def lifespan(app: FastAPI):
         # Initialize database connection
         await init_db()
         logger.info("Database connected successfully")
+
+        # Initialize Redis connection
+        from app.utils.redis_client import init_redis
+        await init_redis()
+        logger.info("Redis initialized")
+
         yield
     finally:
         # Shutdown
         logger.info("Shutting down LibreChat API")
+
+        # Close Redis connection
+        from app.utils.redis_client import close_redis
+        await close_redis()
+
+        # Close database connection
         await close_db()
 
 
@@ -108,16 +120,34 @@ async def root():
 
 
 # Import and include routers
-from app.routes import auth, user
+from app.routes import (
+    auth,
+    user,
+    messages,
+    conversations,
+    files,
+    prompts,
+    balance,
+    config,
+    models,
+    presets,
+    search,
+)
 
-app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-app.include_router(user.router, prefix="/api/user", tags=["user"])
+app.include_router(auth.router)
+app.include_router(user.router)
+app.include_router(messages.router)
+app.include_router(conversations.router)
+app.include_router(files.router)
+app.include_router(prompts.router)
+app.include_router(balance.router)
+app.include_router(config.router)
+app.include_router(models.router)
+app.include_router(presets.router)
+app.include_router(search.router)
 
 # TODO: Add remaining route modules as they are created
-# from app.routes import messages, conversations, prompts, agents, etc.
-# app.include_router(messages.router, prefix="/api/messages", tags=["messages"])
-# app.include_router(conversations.router, prefix="/api/convos", tags=["conversations"])
-# etc.
+# agents, assistants, actions, plugins, oauth, mcp, tags, etc.
 
 
 if __name__ == "__main__":

@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  api-python:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: librechat-api-python
+    ports:
+      - "8000:8000"
+    environment:
+      # Server
+      - HOST=0.0.0.0
+      - PORT=8000
+      - DEBUG=true
+
+      # Database
+      - MONGO_URI=mongodb://mongodb:27017/librechat
+
+      # Redis
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=
+
+      # JWT Secrets (CHANGE THESE IN PRODUCTION!)
+      - JWT_SECRET=your-secret-key-change-in-production
+      - JWT_REFRESH_SECRET=your-refresh-secret-change-in-production
+
+      # CORS
+      - ALLOWED_DOMAINS=http://localhost:3080,http://localhost:3000
+
+      # File Storage
+      - FILE_STRATEGY=local
+      - FILE_UPLOAD_PATH=/app/uploads
+
+    volumes:
+      - .:/app
+      - uploads:/app/uploads
+
+    depends_on:
+      - mongodb
+      - redis
+
+    networks:
+      - librechat-network
+
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:6.0
+    container_name: librechat-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=librechat
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - librechat-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: librechat-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - librechat-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+volumes:
+  mongodb-data:
+  redis-data:
+  uploads:
+
+networks:
+  librechat-network:
+    driver: bridge
